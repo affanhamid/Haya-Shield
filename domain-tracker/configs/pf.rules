@@ -1,7 +1,1 @@
 # Haya Shield rules\nblock drop from any to 185.88.181.55
-block drop quick proto tcp from any to 66.254.114.41 port 443
-block drop quick proto icmp from any to 66.254.114.41
-block drop quick proto tcp from any to 185.88.181.8 port 443
-block drop quick proto icmp from any to 185.88.181.8
-block drop quick proto tcp from any to 185.88.181.53 port 443
-block drop quick proto icmp from any to 185.88.181.53
