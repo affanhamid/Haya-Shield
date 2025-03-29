@@ -109,8 +109,12 @@ configs/
     - Lock file via `chflags schg`
 
 - [ ] **Block all protocols**
+
   - Currently blocks TCP, UDP, and ICMP
   - Needs QUIC (UDP 443) + IPv6 to be enforced everywhere
+
+- [ ] **correctly start on startup**
+  - While the binaries start on startup, the firewall has some issues getting up to speed
 
 ---
 
@@ -144,4 +148,3 @@ It should show `state = running`.
 ## License
 
 Private use only. Developed as part of the Haya Project.
-
