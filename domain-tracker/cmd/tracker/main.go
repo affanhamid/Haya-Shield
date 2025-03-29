@@ -8,13 +8,14 @@ import (
 	"github.com/affanhamid/domain-tracker/internal/capture"
 	"github.com/affanhamid/domain-tracker/internal/filter"
 	"github.com/affanhamid/domain-tracker/internal/guardian"
+	"github.com/affanhamid/domain-tracker/internal/utils"
 )
 
 var restartChan = make(chan struct{})
 
 func runSnifferLoop() {
 	for {
-		blocklist := filter.LoadBlockedList("configs/blocked_ips.json")
+		blocklist := filter.LoadBlockedList(utils.GetPath("configs/blocked_ips.json"))
 		device := capture.AutoDetectInterface()
 
 		done := make(chan struct{})
@@ -38,7 +39,7 @@ func main() {
 
 	go runSnifferLoop()
 
-	err := guardian.WatchFile("configs/blocked_ips.json", func() {
+	err := guardian.WatchFile(utils.GetPath("configs/blocked_ips.json"), func() {
 		fmt.Println("🛠️ Config changed — reloading blocklist + restarting sniffer")
 		restartChan <- struct{}{}
 	})
