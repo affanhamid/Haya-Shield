@@ -14,9 +14,7 @@ func GetPath(rel string) string {
 
 	exeDir := filepath.Dir(exePath)
 
-	// dev mode fallback
 	if strings.Contains(exePath, "/go-build") {
-		// fallback to working directory
 		wd, err := os.Getwd()
 		if err != nil {
 			panic(err)

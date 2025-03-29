@@ -9,8 +9,10 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+  "net"
 
 	"github.com/affanhamid/domain-tracker/internal/guardian"
+	"github.com/affanhamid/domain-tracker/internal/utils"
 )
 
 func LoadBlockedList(path string) map[string]bool {
@@ -43,20 +45,34 @@ const (
 )
 
 func BlockIP(ip string) error {
-ruleTCP := fmt.Sprintf("block drop quick proto tcp from any to %s port 443", ip)
-ruleICMP := fmt.Sprintf("block drop quick proto icmp from any to %s", ip)
+	parsed := net.ParseIP(ip)
+	if parsed == nil {
+		return fmt.Errorf("invalid IP address: %s", ip)
+	}
 
+	isIPv6 := parsed.To4() == nil
+	proto := "inet"
+	if isIPv6 {
+		proto = "inet6"
+	}
+
+	ruleTCP := fmt.Sprintf("block drop quick %s proto tcp from any to %s port 443", proto, ip)
+	ruleUDP := fmt.Sprintf("block drop quick %s proto udp from any to %s port 443", proto, ip)
+	ruleICMP := fmt.Sprintf("block drop quick %s proto icmp from any to %s", proto, ip)
+
+	newRules := []string{ruleTCP, ruleUDP, ruleICMP}
 	existingRules := make(map[string]bool)
 
 	// Step 1: Read existing rules
-	file, err := os.Open(pfRuleFile)
+	file, err := os.Open(utils.GetPath(pfRuleFile))
 	if err != nil {
 		if os.IsNotExist(err) {
-			// File doesn't exist — create with both rules
-			content := ruleTCP + "\n" + ruleICMP + "\n"
+			// Create file with all rules
+			content := strings.Join(newRules, "\n") + "\n"
 			if err := os.WriteFile(pfRuleFile, []byte(content), 0644); err != nil {
 				return fmt.Errorf("failed to create pf.rules: %v", err)
 			}
+			fmt.Printf("📦 Created pf.rules with rules for %s (%s)\n", ip, proto)
 			return ReloadPF()
 		}
 		return err
@@ -68,40 +84,38 @@ ruleICMP := fmt.Sprintf("block drop quick proto icmp from any to %s", ip)
 		existingRules[strings.TrimSpace(scanner.Text())] = true
 	}
 
-	// Step 2: Append missing rules
-	var newRules []string
-	if !existingRules[ruleTCP] {
-		newRules = append(newRules, ruleTCP)
-	}
-	if !existingRules[ruleICMP] {
-		newRules = append(newRules, ruleICMP)
-	}
-
-	if len(newRules) == 0 {
-		// No new rules to add
-		return nil
-	}
-
-	f, err := os.OpenFile(pfRuleFile, os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
+	// Step 2: Append only new rules
+	toAdd := []string{}
 	for _, rule := range newRules {
-		if _, err := f.WriteString(rule + "\n"); err != nil {
-			return err
+		if !existingRules[rule] {
+			toAdd = append(toAdd, rule)
 		}
 	}
 
-	fmt.Println("📦 Added new rules, reloading PF...")
+	if len(toAdd) == 0 {
+		return nil
+	}
+
+	f, err := os.OpenFile(utils.GetPath(pfRuleFile), os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to open pf.rules for appending: %v", err)
+	}
+	defer f.Close()
+
+	for _, rule := range toAdd {
+		if _, err := f.WriteString(rule + "\n"); err != nil {
+			return fmt.Errorf("failed to write rule: %v", err)
+		}
+	}
+
+	fmt.Printf("📦 Appended %d new rules for %s (%s)\n", len(toAdd), ip, proto)
 	return ReloadPF()
 }
 
 func ReloadPF() error {
 	fmt.Println("🔁 Reloading pf.rules...")
 
-	cmd := exec.Command("sudo", "pfctl", "-a", anchorName, "-f", pfRuleFile)
+	cmd := exec.Command("sudo", "pfctl", "-a", anchorName, "-f", utils.GetPath(pfRuleFile))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
