@@ -10,3 +10,4 @@ block drop from any to 185.88.181.5
 block drop from any to 185.88.181.56
 block drop from any to 185.88.181.6
 block drop from any to 104.18.146.40
+block drop from any to 94.75.220.1
