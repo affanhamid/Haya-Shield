@@ -1,0 +1,2 @@
+# Haya Shield rules\nblock drop from any to 185.88.181.55
+block drop from any to 185.88.181.5
