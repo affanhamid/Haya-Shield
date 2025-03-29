@@ -17,3 +17,6 @@ block drop quick inet proto icmp from any to 159.203.159.148
 block drop quick inet proto tcp from any to 185.88.181.8 port 443
 block drop quick inet proto udp from any to 185.88.181.8 port 443
 block drop quick inet proto icmp from any to 185.88.181.8
+block drop quick inet proto tcp from any to 94.75.220.2 port 443
+block drop quick inet proto udp from any to 94.75.220.2 port 443
+block drop quick inet proto icmp from any to 94.75.220.2

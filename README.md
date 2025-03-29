@@ -114,7 +114,13 @@ configs/
   - Needs QUIC (UDP 443) + IPv6 to be enforced everywhere
 
 - [ ] **correctly start on startup**
+
   - While the binaries start on startup, the firewall has some issues getting up to speed
+
+- [ ] **Autoupdate active interface**
+  - Right now, once it latches on to a network device, it doesn't change it, so if you have a vpn on
+    and you turn your device on, the script will be latched on to the vpn interface. But if you close
+    your vpn, it doesn't update. The same for the other way
 
 ---
 
