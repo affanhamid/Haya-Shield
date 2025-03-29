@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+  "net"
 
 	"github.com/affanhamid/domain-tracker/internal/guardian"
 )
@@ -45,7 +46,17 @@ const (
 )
 
 func BlockIP(ip string) error {
-	rule := fmt.Sprintf("block drop from any to %s", ip)
+  parsedIP := net.ParseIP(ip)
+  if parsedIP == nil {
+      return fmt.Errorf("invalid IP: %s", ip)
+  }
+
+  var rule string
+  if parsedIP.To4() != nil {
+      rule = fmt.Sprintf("block drop from any to %s", ip) // IPv4
+  } else {
+      rule = fmt.Sprintf("block drop inet6 from any to %s", ip) // IPv6
+  }
 
 	// Step 1: Check if rule already exists
 	file, err := os.Open(pfRuleFile)
@@ -80,14 +91,23 @@ func BlockIP(ip string) error {
 	if _, err := f.WriteString(rule + "\n"); err != nil {
 		return err
 	}
+  fmt.Println("reloading pf prior");
 
 	// Step 3: Reload into anchor
 	return ReloadPF()
 }
 
 func ReloadPF() error {
-	cmd := exec.Command("sudo", "pfctl", "-a", anchorName, "-f", pfRuleFile)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
+    fmt.Println("Reloading pf.rules...")
+
+    cmd := exec.Command("sudo", "pfctl", "-a", anchorName, "-f", pfRuleFile)
+    cmd.Stdout = os.Stdout
+    cmd.Stderr = os.Stderr
+    err := cmd.Run()
+    if err != nil {
+        fmt.Printf("❌ Failed to reload pf.rules: %v\n", err)
+    } else {
+        fmt.Println("✅ Successfully reloaded pf.rules")
+    }
+    return err
 }

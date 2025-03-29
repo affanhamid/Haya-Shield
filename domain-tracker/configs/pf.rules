@@ -1,2 +1,12 @@
 # Haya Shield rules\nblock drop from any to 185.88.181.55
+block drop from any to 185.88.181.3
+block drop from any to 185.88.181.7
+block drop from any to 66.254.114.41
+block drop from any to 190.115.31.243
+block drop from any to 185.88.181.2
+block drop from any to 185.88.181.9
+block drop from any to 104.18.147.40
 block drop from any to 185.88.181.5
+block drop from any to 185.88.181.56
+block drop from any to 185.88.181.6
+block drop from any to 104.18.146.40
