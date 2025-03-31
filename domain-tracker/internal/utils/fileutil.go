@@ -24,3 +24,4 @@ func GetPath(rel string) string {
 
 	return filepath.Join(exeDir, rel)
 }
+

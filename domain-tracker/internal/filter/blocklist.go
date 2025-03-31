@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -15,14 +14,22 @@ import (
 	"github.com/affanhamid/domain-tracker/internal/utils"
 )
 
-func LoadBlockedList(path string) map[string]bool {
-	data, err := ioutil.ReadFile(path)
+func LoadFileAndCache(path string) ([]byte, error) {
+	data, err := os.ReadFile(path)
 	if err != nil {
-		log.Printf("Failed to read blocklist: %v", err)
-		return map[string]bool{}
+		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
 
 	guardian.UpdateBuffer(path, data)
+	return data, nil
+}
+
+func LoadBlockedList(path string) map[string]bool {
+  data, err := LoadFileAndCache(path)
+	if err != nil {
+		log.Printf("Failed to load blocklist: %v", err)
+		return map[string]bool{}
+	}
 
 	var parsed struct {
 		Blocked []string `json:"blocked"`

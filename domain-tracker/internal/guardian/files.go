@@ -5,6 +5,7 @@ import (
 	"os"
 	"sync"
 	"time"
+  "path/filepath"
 
 	"github.com/affanhamid/domain-tracker/internal/utils"
 )
@@ -30,6 +31,7 @@ var files = []*FileCache{
 
 func MonitorFiles() {
 	for _, f := range files {
+    f.preload()
 		go f.watch()
 	}
 }
@@ -46,6 +48,12 @@ func (f *FileCache) watch() {
 
 			if len(data) == 0 {
 				data = []byte(f.Default)
+			}
+      // 🛠 Ensure parent directory exists
+			dir := filepath.Dir(utils.GetPath(f.Path))
+			if err := os.MkdirAll(dir, 0755); err != nil {
+				fmt.Println("❌ Failed to create directory:", err)
+				continue
 			}
 
 			if err := os.WriteFile(utils.GetPath(f.Path), data, 0644); err != nil {
@@ -68,6 +76,18 @@ func UpdateBuffer(path string, content []byte) {
 			f.Mutex.Unlock()
 			return
 		}
+	}
+}
+
+func (f *FileCache) preload() {
+	fullPath := utils.GetPath(f.Path)
+
+	data, err := os.ReadFile(fullPath)
+	if err == nil && len(data) > 0 {
+		f.Mutex.Lock()
+		f.Buffer = data
+		f.Mutex.Unlock()
+		fmt.Println("📦 Preloaded:", fullPath)
 	}
 }
 

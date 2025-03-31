@@ -1,22 +1,4 @@
-# Haya Shield rules\nblock drop from any to 185.88.181.55
-block drop quick inet proto tcp from any to 185.88.181.7 port 443
-block drop quick inet proto udp from any to 185.88.181.7 port 443
-block drop quick inet proto icmp from any to 185.88.181.7
-block drop quick inet proto tcp from any to 66.254.114.41 port 443
-block drop quick inet proto udp from any to 66.254.114.41 port 443
-block drop quick inet proto icmp from any to 66.254.114.41
+# Haya Shield rules\n
 block drop quick inet proto tcp from any to 190.115.31.243 port 443
 block drop quick inet proto udp from any to 190.115.31.243 port 443
 block drop quick inet proto icmp from any to 190.115.31.243
-block drop quick inet proto tcp from any to 185.88.181.55 port 443
-block drop quick inet proto udp from any to 185.88.181.55 port 443
-block drop quick inet proto icmp from any to 185.88.181.55
-block drop quick inet proto tcp from any to 159.203.159.148 port 443
-block drop quick inet proto udp from any to 159.203.159.148 port 443
-block drop quick inet proto icmp from any to 159.203.159.148
-block drop quick inet proto tcp from any to 185.88.181.8 port 443
-block drop quick inet proto udp from any to 185.88.181.8 port 443
-block drop quick inet proto icmp from any to 185.88.181.8
-block drop quick inet proto tcp from any to 94.75.220.2 port 443
-block drop quick inet proto udp from any to 94.75.220.2 port 443
-block drop quick inet proto icmp from any to 94.75.220.2
