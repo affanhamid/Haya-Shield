@@ -12,7 +12,7 @@ import (
 
 var pfAnchorLines = []string{
 	`anchor "haya.shield"`,
-	`load anchor "haya.shield" from "/Users/affanhamid/Projects/Haya-Shield/domain-tracker/configs/pf.rules"`,
+	`load anchor "haya.shield" from "/etc/haya/pf.rules"`,
 }
 
 func EnsurePfAnchor() error {

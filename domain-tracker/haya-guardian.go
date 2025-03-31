@@ -38,6 +38,8 @@ func main() {
 			fmt.Println("🚨 Haya Shield daemon missing — trying to restore")
 			if err := restoreDaemon(); err != nil {
 				fmt.Println("❌ Failed to restore daemon:", err)
+
+        exec.Command("bash", "/usr/local/bin/haya-intervene.sh").Run()
 			} else {
 				fmt.Println("✅ Daemon relaunched successfully")
 			}

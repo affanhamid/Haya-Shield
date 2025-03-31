@@ -154,6 +154,8 @@ func runHayaShield() {
 				cmd := exec.Command("launchctl", "bootstrap", "system", "/Library/LaunchDaemons/com.haya.guardian.plist")
 				if err := cmd.Run(); err != nil {
 					fmt.Println("❌ Failed to restore guardian:", err)
+          exec.Command("bash", "/usr/local/bin/haya-intervene.sh").Run()
+
 				} else {
 					fmt.Println("✅ Guardian relaunched successfully")
 				}
