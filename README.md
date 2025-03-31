@@ -94,12 +94,6 @@ configs/
 
 ## TODO
 
-- [ ] **Make it unkillable**
-
-  - `launchd` ensures auto-restart on crash
-  - But `sudo launchctl bootout` still disables it
-  - Solution: add a `watchdog` process that resurrects it
-
 - [ ] **Block all protocols**
 
   - Currently blocks TCP, UDP, and ICMP
